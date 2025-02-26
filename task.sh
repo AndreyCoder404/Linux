@@ -1,49 +1,62 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
-# 1) создайте директорию dir1
-mkdir dir1
+# создаём каталог task с вложенными директориями
+# task
+#   dir1
+#   dir2
+#   dir3
+#       dir4
+mkdir -p task/dir1
+mkdir -p task/dir2
+mkdir -p task/dir3/dir4
 
-# 2) создайте директорию dir2
-mkdir dir2
+# изменяем текущую директорию на task
+cd task
 
-# 3) создайте директорию dir3/dir4
-mkdir -p dir3/dir4
+# создаём пустой файл task/dir2/empty
+touch dir2/empty
 
-# 4) создайте в каждой из этих директорий файл list.txt
-touch dir1/list.txt
-touch dir2/list.txt
-touch dir3/dir4/list.txt
+# создаём файл task/dir2/hello.sh с таким содержанием:
+# #!/bin/bash
+# echo "$1, привет!"
+echo '#!/bin/bash' > dir2/hello.sh
+echo 'echo "$1, привет!"' >> dir2/hello.sh
 
-# 5) создайте в dir1 файл summary.txt
-touch dir1/summary.txt
+# устанавливаем для task/dir2/hello.sh права rwxrw-r--
+chmod 764 dir2/hello.sh
 
-# 6) выведите на экран пути к созданным файлам list.txt (dir2, dir3/dir4) и summary.txt (dir1)
-find ./dir2 -name list.txt
-find ./dir3/dir4 -name list.txt
-find ./dir1 -name summary.txt
+# сохраняем список файлов task/dir2 в task/dir2/list.txt
+ls dir2 > dir2/list.txt
 
-# 7) выведите содержимое summary.txt (сейчас оно пустое, поэтому выводим слово "empty")
-echo "empty"
+# копируем содержимое каталога task/dir2 в каталог task/dir3/dir4
+cp -r dir2/* dir3/dir4
 
-# 8) создайте в текущей директории файл hello.sh
-touch hello.sh
+# записываем в task/dir1/summary.txt список файлов с расширением *.txt
+# находящихся в task, включая поддиректории
+find . -name "*.txt" > dir1/summary.txt
 
-# 9) создайте в текущей директории файл list.txt
-touch list.txt
+# дописываем в task/dir1/summary.txt содержимое task/dir2/list.txt
+cat dir2/list.txt >> dir1/summary.txt
 
-# 10) выведите список файлов в текущей директории
-ls
+# определяем переменную окружения NAME со значением "Всем студентам"
+export NAME="Всем студентам"
 
-# 11) сделайте hello.sh исполняемым
-chmod +x hello.sh
+# запускаем task/dir2/hello.sh с переменной окружения NAME в качестве аргумента
+# вывод скрипта должен дописаться в файл task/dir1/summary.txt
+./dir2/hello.sh "$NAME" >> dir1/summary.txt
 
-# 12) запишите в hello.sh команду, выводящую "Всем студентам, привет!"
-echo 'echo "Всем студентам, привет!"' > hello.sh
+# перемещаем с переименованием task/dir1/summary.txt в task/Практическое задание
+mv dir1/summary.txt "Практическое задание"
 
-# 13) запустите hello.sh
-./hello.sh
+# выводим на консоль содержимое файла task/Практическое задание
+cat "Практическое задание"
 
-# 14) выведите пути к summary.txt (в dir1) и list.txt (в dir2, dir3/dir4)
-find ./dir1 -name summary.txt
-find ./dir2 -name list.txt
-find ./dir3/dir4 -name list.txt
+# ищем в файле "Практическое задание" строки, которые содержат слово "dir"
+# и затем отсортировываем их
+grep "dir" "Практическое задание" | sort
+
+# меняем текущую директорию на родительскую для task
+cd ..
+
+# удаляем директорию task со всем содержимым
+rm -rf task
